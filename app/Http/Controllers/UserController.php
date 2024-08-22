@@ -20,6 +20,8 @@ class UserController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'customer', 
+
         ]);
 
         return response()->json($user,200);
@@ -41,7 +43,7 @@ class UserController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['token' => $token, 'user' => ['name'=> $user -> name, 
-        'email'=> $user->email]], 200);
+        'email'=> $user->email,'role' => $user->role,]], 200);
     }
     public function getUser()
     {
