@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 
 class SubcategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subcategories = Subcategory::all();
+        $categoryId = $request->query('category_id');
+        $subcategories = Subcategory::where('category_id', $categoryId)->get();
         return response()->json($subcategories);
     }
 

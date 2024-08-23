@@ -22,3 +22,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', CategoryController::class);
 Route::apiResource('subcategories', SubcategoryController::class);
 });
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/subcategories', [SubcategoryController::class, 'index']);
+// In routes/api.php
+Route::get('/products', [ProductController::class, 'index']);
+Route::post('/products', [ProductController::class, 'store']);
+Route::put('/products/{product}', [ProductController::class, 'update']);
+Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+

@@ -24,27 +24,20 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'category_id' => 'required|exists:categories,id',
-            'sub_category_id' => 'required|exists:sub_categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        $data = $request->all();
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('product_images', 'public');
-            $data['image'] = $imagePath;
-        }
-
-        Product::create($data);
-
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
-    }
+        {
+            // Handle file upload
+            $data = $request->all();
+        
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('product_images', 'public');
+                $data['image'] = $imagePath;
+            }
+        
+            // Create the product without validation
+            $product = Product::create($data);
+        
+            return response()->json($product, 201);
+        }}
 
     public function edit(Product $product)
     {
