@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
@@ -14,10 +15,6 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
-        ]);
 
         $cartItem = CartItem::updateOrCreate(
             ['user_id' => $request->user()->id, 'product_id' => $request->product_id],

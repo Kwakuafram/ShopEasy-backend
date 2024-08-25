@@ -15,7 +15,6 @@ Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanct
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('products', ProductController::class);
-    Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart-items', CartController::class);
     Route::post('payments', [PaymentController::class, 'store']);
     Route::get('payments/{id}', [PaymentController::class, 'show']);
@@ -24,9 +23,22 @@ Route::apiResource('subcategories', SubcategoryController::class);
 });
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/subcategories', [SubcategoryController::class, 'index']);
-// In routes/api.php
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
 Route::put('/products/{product}', [ProductController::class, 'update']);
 Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+});
+Route::get('/getUsers', [UserController::class, 'getUsers']);
+Route::post('/verify-email', [UserController::class, 'verifyEmail']);
+
+Route::put('/resetPassword', [UserController::class, 'resetPassword']);
+Route::apiResource('orders', OrderController::class);
+
+Route::get('/getCards', [OrderController::class, 'getCards']);
 

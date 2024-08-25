@@ -4,22 +4,31 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+
+
 
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::all();
-        return response()->json($orders, 200);
+        {
+            $orders = Order::select('orders.id', 'orders.created_at', 'orders.status', 'orders.total_amount', 'products.name as product_name', 'users.name as user_name')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->join('products', 'order_items.product_id', '=', 'products.id')
+                ->join('users', 'orders.user_id', '=', 'users.id')
+                ->groupBy('orders.id', 'orders.created_at', 'orders.status', 'orders.total_amount', 'products.name', 'users.name')
+                ->get();
+    
+            return response()->json($orders, 200);
+        }
+    
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'total_amount' => 'required|numeric',
-            'order_items' => 'required|array',
-        ]);
+      
 
         $order = Order::create([
             'user_id' => $request->user_id,
@@ -63,5 +72,26 @@ class OrderController extends Controller
         $order->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function getCards()
+    {
+        $aggregates = DB::table('orders')
+            ->selectRaw('
+                SUM(total_amount) as total_orders,
+                SUM(CASE WHEN status = "pending" THEN total_amount ELSE 0 END) as pending_orders,
+                SUM(CASE WHEN status = "completed" THEN total_amount ELSE 0 END) as completed_orders
+            ')
+            ->first();
+
+        // Get total distinct users count
+        $totalUsers = User::distinct('id')->count('id');
+
+        return response()->json([
+            'total_orders' => $aggregates->total_orders,
+            'pending_orders' => $aggregates->pending_orders,
+            'completed_orders' => $aggregates->completed_orders,
+            'total_users' => $totalUsers,
+        ], 200);
     }
 }
